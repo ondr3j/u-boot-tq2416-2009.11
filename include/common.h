@@ -239,6 +239,8 @@ void flash_perror (int);
 int	source (ulong addr, const char *fit_uname);
 
 extern ulong load_addr;		/* Default Load Address */
+extern ulong save_addr;   /* Default Save Address */
+extern ulong save_size;   /* Default Save Size */
 
 /* common/cmd_doc.c */
 void	doc_probe(unsigned long physadr);
@@ -610,6 +612,7 @@ int	init_timebase (void);
 
 /* lib_generic/vsprintf.c */
 ulong	simple_strtoul(const char *cp,char **endp,unsigned int base);
+int strict_strtoul(const char *cp, unsigned int base, unsigned long *res);
 #ifdef CONFIG_SYS_64BIT_VSPRINTF
 unsigned long long	simple_strtoull(const char *cp,char **endp,unsigned int base);
 #endif

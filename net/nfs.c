@@ -29,8 +29,6 @@
 #include "nfs.h"
 #include "bootp.h"
 
-#if defined(CONFIG_CMD_NET) && defined(CONFIG_CMD_NFS)
-
 #define HASHES_PER_LINE 65	/* Number of "loading" hashes per line	*/
 #define NFS_RETRY_COUNT 30
 #define NFS_TIMEOUT 2000UL
@@ -582,7 +580,7 @@ NfsTimeout (void)
 }
 
 static void
-NfsHandler (uchar *pkt, unsigned dest, unsigned src, unsigned len)
+NfsHandler(uchar *pkt, unsigned dest, IPaddr_t sip, unsigned src, unsigned len)
 {
 	int rlen;
 
@@ -690,7 +688,7 @@ NfsStart (void)
 	}
 
 	if (BootFile[0] == '\0') {
-		sprintf (default_filename, "/nfsroot/%02lX%02lX%02lX%02lX.img",
+		sprintf(default_filename, "/nfsroot/%02X%02X%02X%02X.img",
 			NetOurIP & 0xFF,
 			(NetOurIP >>  8) & 0xFF,
 			(NetOurIP >> 16) & 0xFF,
@@ -716,10 +714,7 @@ NfsStart (void)
 	nfs_filename = basename (nfs_path);
 	nfs_path     = dirname (nfs_path);
 
-#if defined(CONFIG_NET_MULTI)
 	printf ("Using %s device\n", eth_get_name());
-#endif
-
 	printf("File transfer via NFS from server %pI4"
 		"; our IP address is %pI4", &NfsServerIP, &NetOurIP);
 
@@ -755,5 +750,3 @@ NfsStart (void)
 
 	NfsSend ();
 }
-
-#endif

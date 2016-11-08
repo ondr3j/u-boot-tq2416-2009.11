@@ -74,6 +74,9 @@ SPI_FLASH|MG_DISK|NVRAM|NOWHERE}
 /************************************************************************
 ************************************************************************/
 
+ulong save_addr;			/* Default Save Address */
+ulong save_size;			/* Default Save Size (in bytes) */
+
 /*
  * Table with supported baudrates (defined in config_xyz.h)
  */

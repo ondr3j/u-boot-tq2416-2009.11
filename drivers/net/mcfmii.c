@@ -35,7 +35,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#if defined(CONFIG_CMD_NET) && defined(CONFIG_NET_MULTI)
+#if defined(CONFIG_CMD_NET)
 #undef MII_DEBUG
 #undef ET_DEBUG
 

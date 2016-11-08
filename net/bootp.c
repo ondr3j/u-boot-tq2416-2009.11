@@ -20,8 +20,6 @@
 
 #define BOOTP_VENDOR_MAGIC	0x63825363	/* RFC1048 Magic Cookie		*/
 
-#if defined(CONFIG_CMD_NET)
-
 #define TIMEOUT		5000UL	/* Milliseconds before trying BOOTP again */
 #ifndef CONFIG_NET_RETRY_COUNT
 # define TIMEOUT_COUNT	5		/* # of timeouts before giving up  */
@@ -46,7 +44,8 @@ ulong		seed1, seed2;
 dhcp_state_t dhcp_state = INIT;
 unsigned long dhcp_leasetime = 0;
 IPaddr_t NetDHCPServerIP = 0;
-static void DhcpHandler(uchar * pkt, unsigned dest, unsigned src, unsigned len);
+static void DhcpHandler(uchar *pkt, unsigned dest, IPaddr_t sip, unsigned src,
+			unsigned len);
 
 /* For Debug */
 #if 0
@@ -280,14 +279,15 @@ static void BootpVendorProcess (u8 * ext, int size)
 	if (NetBootFileSize)
 		debug("NetBootFileSize: %d\n", NetBootFileSize);
 }
+
 /*
  *	Handle a BOOTP received packet.
  */
 static void
-BootpHandler(uchar * pkt, unsigned dest, unsigned src, unsigned len)
+BootpHandler(uchar *pkt, unsigned dest, IPaddr_t sip, unsigned src,
+	     unsigned len)
 {
 	Bootp_t *bp;
-	char	*s;
 
 	debug("got BOOTP packet (src=%d, dst=%d, len=%d want_len=%zu)\n",
 		src, dest, len, sizeof (Bootp_t));
@@ -314,26 +314,7 @@ BootpHandler(uchar * pkt, unsigned dest, unsigned src, unsigned len)
 
 	debug("Got good BOOTP\n");
 
-	if ((s = getenv("autoload")) != NULL) {
-		if (*s == 'n') {
-			/*
-			 * Just use BOOTP to configure system;
-			 * Do not use TFTP to load the bootfile.
-			 */
-			NetState = NETLOOP_SUCCESS;
-			return;
-#if defined(CONFIG_CMD_NFS)
-		} else if (strcmp(s, "NFS") == 0) {
-			/*
-			 * Use NFS to load the bootfile.
-			 */
-			NfsStart();
-			return;
-#endif
-		}
-	}
-
-	TftpStart();
+	net_auto_load();
 }
 #endif
 
@@ -544,7 +525,7 @@ static int BootpExtended (u8 * e)
 void
 BootpRequest (void)
 {
-	volatile uchar *pkt, *iphdr;
+	uchar *pkt, *iphdr;
 	Bootp_t *bp;
 	int ext_len, pktlen, iplen;
 
@@ -796,7 +777,7 @@ static int DhcpMessageType(unsigned char *popt)
 
 static void DhcpSendRequestPkt(Bootp_t *bp_offer)
 {
-	volatile uchar *pkt, *iphdr;
+	uchar *pkt, *iphdr;
 	Bootp_t *bp;
 	int pktlen, iplen, extlen;
 	IPaddr_t OfferedIP;
@@ -856,7 +837,8 @@ static void DhcpSendRequestPkt(Bootp_t *bp_offer)
  *	Handle DHCP received packets.
  */
 static void
-DhcpHandler(uchar * pkt, unsigned dest, unsigned src, unsigned len)
+DhcpHandler(uchar *pkt, unsigned dest, IPaddr_t sip, unsigned src,
+	    unsigned len)
 {
 	Bootp_t *bp = (Bootp_t *)pkt;
 
@@ -902,34 +884,13 @@ DhcpHandler(uchar * pkt, unsigned dest, unsigned src, unsigned len)
 		debug("DHCP State: REQUESTING\n");
 
 		if ( DhcpMessageType((u8 *)bp->bp_vend) == DHCP_ACK ) {
-			char *s;
-
 			if (NetReadLong((ulong*)&bp->bp_vend[0]) == htonl(BOOTP_VENDOR_MAGIC))
 				DhcpOptionsProcess((u8 *)&bp->bp_vend[4], bp);
 			BootpCopyNetParams(bp); /* Store net params from reply */
 			dhcp_state = BOUND;
 			printf ("DHCP client bound to address %pI4\n", &NetOurIP);
 
-			/* Obey the 'autoload' setting */
-			if ((s = getenv("autoload")) != NULL) {
-				if (*s == 'n') {
-					/*
-					 * Just use BOOTP to configure system;
-					 * Do not use TFTP to load the bootfile.
-					 */
-					NetState = NETLOOP_SUCCESS;
-					return;
-#if defined(CONFIG_CMD_NFS)
-				} else if (strcmp(s, "NFS") == 0) {
-					/*
-					 * Use NFS to load the bootfile.
-					 */
-					NfsStart();
-					return;
-#endif
-				}
-			}
-			TftpStart();
+			net_auto_load();
 			return;
 		}
 		break;
@@ -948,5 +909,3 @@ void DhcpRequest(void)
 	BootpRequest();
 }
 #endif	/* CONFIG_CMD_DHCP */
-
-#endif	/* CONFIG_CMD_NET */

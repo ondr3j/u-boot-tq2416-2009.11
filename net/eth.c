@@ -26,7 +26,6 @@
 #include <net.h>
 #include <miiphy.h>
 
-#ifdef CONFIG_CMD_NET
 void eth_parse_enetaddr(const char *addr, uchar *enetaddr)
 {
 	char *end;
@@ -60,9 +59,14 @@ int eth_getenv_enetaddr_by_index(int index, uchar *enetaddr)
 	sprintf(enetvar, index ? "eth%daddr" : "ethaddr", index);
 	return eth_getenv_enetaddr(enetvar, enetaddr);
 }
-#endif
 
-#if defined(CONFIG_CMD_NET) && defined(CONFIG_NET_MULTI)
+static int eth_mac_skip(int index)
+{
+	char enetvar[15];
+	char *skip_state;
+	sprintf(enetvar, index ? "eth%dmacskip" : "ethmacskip", index);
+	return ((skip_state = getenv(enetvar)) != NULL);
+}
 
 /*
  * CPU and board-specific Ethernet initializations.  Aliased function
@@ -79,8 +83,6 @@ extern int mv6436x_eth_initialize(bd_t *);
 extern int mv6446x_eth_initialize(bd_t *);
 
 #ifdef CONFIG_API
-extern void (*push_packet)(volatile void *, int);
-
 static struct {
 	uchar data[PKTSIZE];
 	int length;
@@ -166,14 +168,12 @@ int eth_register(struct eth_device* dev)
 
 	if (!eth_devices) {
 		eth_current = eth_devices = dev;
-#ifdef CONFIG_NET_MULTI
 		/* update current ethernet name */
 		{
 			char *act = getenv("ethact");
 			if (act == NULL || strcmp(act, eth_current->name) != 0)
 				setenv("ethact", eth_current->name);
 		}
-#endif
 	} else {
 		for (d=eth_devices; d->next!=eth_devices; d=d->next);
 		d->next = dev;
@@ -245,12 +245,16 @@ int eth_initialize(bd_t *bis)
 
 				memcpy(dev->enetaddr, env_enetaddr, 6);
 			}
+			if (dev->write_hwaddr &&
+				!eth_mac_skip(eth_number) &&
+				is_valid_ether_addr(dev->enetaddr)) {
+				dev->write_hwaddr(dev);
+			}
 
 			eth_number++;
 			dev = dev->next;
 		} while(dev != eth_devices);
 
-#ifdef CONFIG_NET_MULTI
 		/* update current ethernet name */
 		if (eth_current) {
 			char *act = getenv("ethact");
@@ -258,7 +262,6 @@ int eth_initialize(bd_t *bis)
 				setenv("ethact", eth_current->name);
 		} else
 			setenv("ethact", NULL);
-#endif
 #ifndef CONFIG_EMBEDSKY_MENU
 		putc ('\n');
 #endif
@@ -363,7 +366,7 @@ void eth_halt(void)
 	eth_current->state = ETH_STATE_PASSIVE;
 }
 
-int eth_send(volatile void *packet, int length)
+int eth_send(void *packet, int length)
 {
 	if (!eth_current)
 		return -1;
@@ -380,7 +383,7 @@ int eth_rx(void)
 }
 
 #ifdef CONFIG_API
-static void eth_save_packet(volatile void *packet, int length)
+static void eth_save_packet(void *packet, int length)
 {
 	volatile char *p = packet;
 	int i;
@@ -398,7 +401,7 @@ static void eth_save_packet(volatile void *packet, int length)
 	eth_rcv_last = (eth_rcv_last + 1) % PKTBUFSRX;
 }
 
-int eth_receive(volatile void *packet, int length)
+int eth_receive(void *packet, int length)
 {
 	volatile char *p = packet;
 	void *pp = push_packet;
@@ -448,21 +451,18 @@ void eth_try_another(int first_restart)
 
 	eth_current = eth_current->next;
 
-#ifdef CONFIG_NET_MULTI
 	/* update current ethernet name */
 	{
 		char *act = getenv("ethact");
 		if (act == NULL || strcmp(act, eth_current->name) != 0)
 			setenv("ethact", eth_current->name);
 	}
-#endif
 
 	if (first_failed == eth_current) {
 		NetRestartWrap = 1;
 	}
 }
 
-#ifdef CONFIG_NET_MULTI
 void eth_set_current(void)
 {
 	static char *act = NULL;
@@ -489,36 +489,8 @@ void eth_set_current(void)
 
 	setenv("ethact", eth_current->name);
 }
-#endif
 
 char *eth_get_name (void)
 {
 	return (eth_current ? eth_current->name : "unknown");
 }
-#elif defined(CONFIG_CMD_NET) && !defined(CONFIG_NET_MULTI)
-
-#warning Ethernet driver is deprecated.  Please update to use CONFIG_NET_MULTI
-
-extern int at91rm9200_miiphy_initialize(bd_t *bis);
-extern int mcf52x2_miiphy_initialize(bd_t *bis);
-extern int ns7520_miiphy_initialize(bd_t *bis);
-
-
-int eth_initialize(bd_t *bis)
-{
-#if defined(CONFIG_MII) || defined(CONFIG_CMD_MII)
-	miiphy_init();
-#endif
-
-#if defined(CONFIG_AT91RM9200)
-	at91rm9200_miiphy_initialize(bis);
-#endif
-#if defined(CONFIG_MCF52x2)
-	mcf52x2_miiphy_initialize(bis);
-#endif
-#if defined(CONFIG_DRIVER_NS7520_ETHERNET)
-	ns7520_miiphy_initialize(bis);
-#endif
-	return 0;
-}
-#endif

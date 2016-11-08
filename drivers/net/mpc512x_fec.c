@@ -18,8 +18,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define DEBUG 0
 
-#if defined(CONFIG_CMD_NET) && defined(CONFIG_NET_MULTI) && \
-	defined(CONFIG_MPC512x_FEC)
+#if defined(CONFIG_CMD_NET) && defined(CONFIG_MPC512x_FEC)
 
 #if !(defined(CONFIG_MII) || defined(CONFIG_CMD_MII))
 #error "CONFIG_MII has to be defined!"

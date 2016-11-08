@@ -21,6 +21,7 @@ unsigned long get_timer(unsigned long);
 void vprintf(const char *, va_list);
 void do_reset (void);
 unsigned long simple_strtoul(const char *cp,char **endp,unsigned int base);
+int strict_strtoul(const char *cp, unsigned int base, unsigned long *res);
 char *getenv (char *name);
 int setenv (char *varname, char *varvalue);
 long simple_strtol(const char *cp,char **endp,unsigned int base);

@@ -443,10 +443,8 @@ extern void davinci_eth_set_mac_addr (const u_int8_t *addr);
 	bb_miiphy_init();
 #endif
 #if defined(CONFIG_CMD_NET)
-#if defined(CONFIG_NET_MULTI)
 #ifndef CONFIG_EMBEDSKY_MENU
 	puts ("Net: ");
-#endif
 #endif
 	eth_initialize(gd->bd);
 #if defined(CONFIG_RESET_PHY_R)

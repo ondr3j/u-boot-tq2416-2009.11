@@ -1,8 +1,10 @@
 /*
- *	LiMon - BOOTP/TFTP.
+ *  LiMon - BOOTP/TFTP.
  *
- *	Copyright 1994, 1995, 2000 Neil Russell.
- *	(See License)
+ *  Copyright 1994, 1995, 2000 Neil Russell.
+ *  Copyright 2011 Comelit Group SpA
+ *                 Luca Ceresoli <luca.ceresoli@comelit.it>
+ *  (See License)
  */
 
 #ifndef __TFTP_H__
@@ -10,11 +12,15 @@
 
 /**********************************************************************/
 /*
- *	Global functions and variables.
+ *  Global functions and variables.
  */
 
 /* tftp.c */
-extern void	TftpStart (void);	/* Begin TFTP get */
+void TftpStart(enum proto_t protocol);  /* Begin TFTP get/put */
+
+#ifdef CONFIG_CMD_TFTPSRV
+extern void TftpStartServer(void);  /* Wait for incoming TFTP put */
+#endif
 
 /**********************************************************************/
 

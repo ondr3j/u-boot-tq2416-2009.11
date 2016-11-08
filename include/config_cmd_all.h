@@ -69,6 +69,7 @@
 #define CONFIG_CMD_PORTIO	/* Port I/O			*/
 #define CONFIG_CMD_REGINFO	/* Register dump		*/
 #define CONFIG_CMD_REISER	/* Reiserfs support		*/
+#define CONFIG_CMD_RARP     /* rarpboot support     */
 #define CONFIG_CMD_RUN		/* run command in env variable	*/
 #define CONFIG_CMD_SAVES	/* save S record dump		*/
 #define CONFIG_CMD_SCSI		/* SCSI Support			*/

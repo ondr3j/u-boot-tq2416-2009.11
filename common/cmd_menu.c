@@ -304,7 +304,7 @@ void main_menu_usage(char menu_type)
 	printf("[0] Set the boot parameters\r\n");
 	printf("[a] Download User Program\r\n");
 #ifdef CONFIG_EmbedSky_LCD
-	printf("[c] Choice lcd type.\r\n");	
+	printf("[c] Choice lcd type.\r\n");
 #endif /* CONFIG_EmbedSky_LCD */
 
 	if( menu_type == USE_USB_DOWN)
@@ -335,7 +335,7 @@ void main_menu_usage(char menu_type)
 	}
 
 	printf("[t] Test Linux Image (zImage)\r\n");
-#ifndef CONFIG_TQ2416
+#ifdef CONFIG_TQ2416
 	if( menu_type == USE_USB_DOWN)
 	{
 		printf("[q] quit from menu\r\n");
@@ -360,13 +360,13 @@ void tftp_menu_shell(void)
 	{
 		main_menu_usage(USE_TFTP_DOWN);
 #if 0
-		while(!(((keyselect >= '0') && (keyselect <= '9')) || 
-			((keyselect == 'a') || (keyselect == 'A')) || 
-			((keyselect == 'n') || (keyselect == 'N')) || 
-			((keyselect == 'p') || (keyselect == 'P')) || 
-			((keyselect == 'r') || (keyselect == 'R')) || 
-			((keyselect == 's') || (keyselect == 'S')) || 
-			((keyselect == 't') || (keyselect == 'T')) || 
+		while(!(((keyselect >= '0') && (keyselect <= '9')) ||
+			((keyselect == 'a') || (keyselect == 'A')) ||
+			((keyselect == 'n') || (keyselect == 'N')) ||
+			((keyselect == 'p') || (keyselect == 'P')) ||
+			((keyselect == 'r') || (keyselect == 'R')) ||
+			((keyselect == 's') || (keyselect == 'S')) ||
+			((keyselect == 't') || (keyselect == 'T')) ||
 			((keyselect == 'q') || (keyselect == 'Q')) ))
 		{
 			keyselect = serial_getc();
@@ -568,7 +568,7 @@ void tftp_menu_shell(void)
 				run_command(cmd_buf, 0);
 				break;
 			}
-			
+
 			case 's':
 			{
 #ifdef CONFIG_MTD_DEVICE
@@ -757,7 +757,7 @@ void sd_menu_shell(void)
 				run_command(cmd_buf, 0);
 				break;
 			}
-			
+
 			case 's':
 			{
 #ifdef CONFIG_MTD_DEVICE
@@ -814,11 +814,11 @@ void menu_shell(void)
 	{
 		main_menu_usage(USE_USB_DOWN);
 #if 0
-		while(!(((keyselect >= '0') && (keyselect <= '9')) || 
-			((keyselect == 'a') || (keyselect == 'A')) || 
-			((keyselect == 'n') || (keyselect == 'N')) || 
-			((keyselect == 'r') || (keyselect == 'R')) || 
-			((keyselect == 't') || (keyselect == 'T')) || 
+		while(!(((keyselect >= '0') && (keyselect <= '9')) ||
+			((keyselect == 'a') || (keyselect == 'A')) ||
+			((keyselect == 'n') || (keyselect == 'N')) ||
+			((keyselect == 'r') || (keyselect == 'R')) ||
+			((keyselect == 't') || (keyselect == 'T')) ||
 			((keyselect == 'q') || (keyselect == 'Q')) ))
 		{
 			keyselect = serial_getc();
@@ -844,7 +844,7 @@ void menu_shell(void)
 				run_command(cmd_buf, 0);
 				break;
 			}
-			
+
 			case '2':
 			{
 				sprintf(cmd_buf, "dnw 0xc0000000; nand erase 0x80000 0x80000; nand write.jffs2 0xc0000000 0x80000 $(filesize)");
@@ -964,7 +964,7 @@ void menu_shell(void)
 				run_command(cmd_buf, 0);
 				break;
 			}
-			
+
 #ifdef CONFIG_CMD_MENU_SD
 			case 'S':
 			case 's':
@@ -981,7 +981,7 @@ void menu_shell(void)
 				run_command(cmd_buf, 0);
 				break;
 			}
-#if 0			
+#if 0
 			case 'C':
 			case 'c':
 			{
@@ -989,7 +989,7 @@ void menu_shell(void)
 				run_command(cmd_buf, 0);
 				break;
 			}
-			
+
 			case 'F':
 			case 'f':
 			{
@@ -997,7 +997,7 @@ void menu_shell(void)
 				run_command(cmd_buf, 0);
 				break;
 			}
-#endif			
+#endif
 #if 0
 			case 'L':
 			case 'l':
@@ -1027,7 +1027,7 @@ void menu_shell(void)
 				else{
 					printf("fat filesystem initial failed! ret=%d\n",FAT_Init());
 				}
-				
+
 				break;
 			}
 #endif
@@ -1039,16 +1039,16 @@ void menu_shell(void)
 				break;
 			}
 #endif
-#ifndef CONFIG_TQ2416
+#ifdef CONFIG_TQ2416
 			case 'Q':
 			case 'q':
 			{
-				return;	
+				return;
 				break;
 			}
 #endif
 		}
-				
+
 	}
 }
 

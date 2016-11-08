@@ -33,7 +33,7 @@
 #define CONFIG_MTD_DEVICE
 #define CONFIG_EMBEDSKY_MENU
 #define CONFIG_EmbedSky_LCD
-#define CONFIG_DEBUG_MSG 
+#define CONFIG_DEBUG_MSG
 
 #ifdef CONFIG_EmbedSky_LCD
 #define CONFIG_LCD_TYPE					X480Y272
@@ -89,7 +89,7 @@
 #define CONFIG_INCLUDE_TEST
 
 #define CONFIG_ZIMAGE_BOOT
-#define CONFIG_IMAGE_BOOT 
+#define CONFIG_IMAGE_BOOT
 
 #define BOARD_LATE_INIT
 
@@ -179,10 +179,11 @@
 #define CONFIG_CMD_DATE
 #define CONFIG_CMD_EXT2
 #define CONFIG_CMD_NET
-#define CONFIG_COMMANDS					1 
+#define CONFIG_COMMANDS					1
 #define CONFIG_CMD_NAND					1
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_MMC
+#define CONFIG_CMD_TFTPPUT
 
 #if 1
 
@@ -207,7 +208,7 @@
 										"2304k(logo)," \
 										"4m(kernel)," \
 										"-(root)"
-	
+
 #endif
 #if 1
 #define CONFIG_BOOTARGS					"noinitrd root=/dev/mtdblock3 rootfstype=yaffs2 init=/linuxrc console=ttySAC0"
@@ -305,7 +306,7 @@
 #define CONFIG_CLK_400_133_66
 //#define CONFIG_CLK_267_133_66
 
-/* 
+/*
 MSYSCLK = MPLL = (Startup_MDIV*Fin)/(Startup_PDIV*(2<<Startup_SDIV))
 HCLK = MSYSCLK/HCLK_Ratio = MSYSCLK/((PREDIV+1)*(HCLKDIV+1))
 ARMCLK = MSYSCLK/ARMCLK_Ratio = MSYSCLK/((ARMDIV[12]+1)*(ARMDIV[11:9]+1))
@@ -721,12 +722,12 @@ ARMCLK = MSYSCLK/ARMCLK_Ratio = MSYSCLK/((ARMDIV[12]+1)*(ARMDIV[11:9]+1))
 //#define CONFIG_NAND_FLASH_BBT
 #define CONFIG_NAND_BL1_8BIT_ECC
 #define CONFIG_NAND_HWECC
-#endif 
+#endif
 #define NAND_MAX_CHIPS					1
 #define NAND_DISABLE_CE()				(NFCONT_REG |= (1 << 1))
 #define NAND_ENABLE_CE()				(NFCONT_REG &= ~(1 << 1))
 #define NF_TRANSRnB()					do { while(!(NFSTAT_REG & (1 << 0))); } while(0)
-#define CONFIG_MMC		
+#define CONFIG_MMC
 //#define CONFIG_MTDPARTITION			"40000 3C0000 3000000"
 #define CONFIG_ONENAND_BASE				(0x00000000)
 //#define CONFIG_MAX_ONENAND_DEVICE	1
@@ -780,6 +781,6 @@ ARMCLK = MSYSCLK/ARMCLK_Ratio = MSYSCLK/((ARMDIV[12]+1)*(ARMDIV[11:9]+1))
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootargs_defaults=setenv bootargs " \
 		"${bootargs} " \
-		"lcd=${lcdtype}\0"  
+		"lcd=${lcdtype}\0"
 
 #endif	/* __CONFIG_H */

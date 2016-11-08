@@ -674,6 +674,8 @@ The following options need to be configured:
 					  (requires CONFIG_CMD_MEMORY)
 		CONFIG_CMD_SOURCE	  "source" command Support
 		CONFIG_CMD_SPI		* SPI serial bus support
+        CONFIG_CMD_TFTPSRV  * TFTP transfer in server mode
+        CONFIG_CMD_TFTPPUT  * TFTP put command (upload)
 		CONFIG_CMD_USB		* USB support
 		CONFIG_CMD_VFD		* VFD support (TRAB)
 		CONFIG_CMD_CDP		* Cisco Discover Protocol support
@@ -2932,6 +2934,7 @@ bootp	- boot image via network using BootP/TFTP protocol
 tftpboot- boot image via network using TFTP protocol
 	       and env variables "ipaddr" and "serverip"
 	       (and eventually "gatewayip")
+tftpput - upload a file via network using TFTP protoco
 rarpboot- boot image via network using RARP/TFTP protocol
 diskboot- boot from IDE devicebootd   - boot default, i.e., run 'bootcmd'
 loads	- load S-Record file over serial line
@@ -2989,7 +2992,9 @@ environment. As long as you don't save the environment you are
 working with an in-memory copy. In case the Flash area containing the
 environment is erased by accident, a default environment is provided.
 
-Some configuration options can be set using Environment Variables:
+Some configuration options can be set using Environment Variables.
+
+List of environment variables (most likely not complete):
 
   baudrate	- see CONFIG_BAUDRATE
 
@@ -3085,41 +3090,50 @@ Some configuration options can be set using Environment Variables:
 
   bootstopkey	- see CONFIG_AUTOBOOT_STOP_STR
 
-  ethprime	- When CONFIG_NET_MULTI is enabled controls which
-		  interface is used first.
+  ethprime   - controls which interface is used first.
 
-  ethact	- When CONFIG_NET_MULTI is enabled controls which
-		  interface is currently active. For example you
-		  can do the following
+  ethact    - controls which interface is currently active.
+          For example you can do the following
 
-		  => setenv ethact FEC ETHERNET
-		  => ping 192.168.0.1 # traffic sent on FEC ETHERNET
-		  => setenv ethact SCC ETHERNET
-		  => ping 10.0.0.1 # traffic sent on SCC ETHERNET
+          => setenv ethact FEC
+          => ping 192.168.0.1 # traffic sent on FEC
+          => setenv ethact SCC
+          => ping 10.0.0.1 # traffic sent on SCC
 
-  ethrotate	- When set to "no" U-Boot does not go through all
-		  available network interfaces.
-		  It just stays at the currently selected interface.
+  ethrotate - When set to "no" U-Boot does not go through all
+          available network interfaces.
+          It just stays at the currently selected interface.
 
-   netretry	- When set to "no" each network operation will
-		  either succeed or fail without retrying.
-		  When set to "once" the network operation will
-		  fail when all the available network interfaces
-		  are tried once without success.
-		  Useful on scripts which control the retry operation
-		  themselves.
+  netretry  - When set to "no" each network operation will
+          either succeed or fail without retrying.
+          When set to "once" the network operation will
+          fail when all the available network interfaces
+          are tried once without success.
+          Useful on scripts which control the retry operation
+          themselves.
 
-  npe_ucode	- set load address for the NPE microcode
+  npe_ucode - set load address for the NPE microcode
 
-  tftpsrcport	- If this is set, the value is used for TFTP's
-		  UDP source port.
+  tftpsrcport   - If this is set, the value is used for TFTP's
+          UDP source port.
 
-  tftpdstport	- If this is set, the value is used for TFTP's UDP
-		  destination port instead of the Well Know Port 69.
+  tftpdstport   - If this is set, the value is used for TFTP's UDP
+          destination port instead of the Well Know Port 69.
 
-   vlan		- When set to a value < 4095 the traffic over
-		  Ethernet is encapsulated/received over 802.1q
-		  VLAN tagged frames.
+  tftpblocksize - Block size to use for TFTP transfers; if not set,
+          we use the TFTP server's default block size
+
+  tftptimeout   - Retransmission timeout for TFTP packets (in milli-
+          seconds, minimum value is 1000 = 1 second). Defines
+          when a packet is considered to be lost so it has to
+          be retransmitted. The default is 5000 = 5 seconds.
+          Lowering this value may make downloads succeed
+          faster in networks with high packet loss rates or
+          with unreliable TFTP servers.
+
+  vlan      - When set to a value < 4095 the traffic over
+          Ethernet is encapsulated/received over 802.1q
+          VLAN tagged frames.
 
 The following environment variables may be used and automatically
 updated by the network boot commands ("bootp" and "rarpboot"),
